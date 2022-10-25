@@ -1,0 +1,20 @@
+npm i typescript -d
+npx tsc --init
+npm install ts-node-dev -D
+ts-node-dev src/index.ts --transpile-only --ignore-watch node_modules --respawn
+ts config --> mudar outDir --> "./dist"
+
+
+gerar o arquivo de lint pro ts:
+1) npm install -D tslint
+2) ./node_modules/.bin/tslint --init
+3) no arquivo tslint.json
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended"],
+  "jsRules": {},
+  "rules": {
+    "no-console": false
+  },
+  "rulesDirectory": []
+}

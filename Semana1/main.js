@@ -3,8 +3,10 @@ const app = express()
 const {v4 : uuidv4} = require('uuid')
 const pizzaList = require('./pizzaList.json')
 let orderList = require('./orderList.json')
+const cors = require('cors')
 
 app.use(express.json())
+app.use(cors())
 
 
 app.listen(3333, () => {
@@ -54,6 +56,7 @@ app.post('/solicitations', (request, response) => {
         payment_method,
         observations,
         pizzas
+        
       } = request.body
 
       const order = {
@@ -74,13 +77,13 @@ app.post('/solicitations', (request, response) => {
 })
 
 app.get('/solicitations/:cpf', (request, response) => {
-    const orderFiltered = orderList.find((order) => order.cpf === request.params.cpf)
+    const orderFiltered = orderList.find((order) => order.document_client === request.params.cpf)
     console.log(orderFiltered)
     response.json(orderFiltered)
 })
 
-app.delete('/solicitations/:cpf', (request, response) => {
-    const newOrders = orderList.filter(order => order.cpf !== request.params.cpf)
+app.delete('/solicitations/:id', (request, response) => {
+    const newOrders = orderList.filter(order => order.id !== request.params.id)
     orderList = [...newOrders]
     response.json({mensagem: 'Pedido deletado com sucesso!'})
 })
