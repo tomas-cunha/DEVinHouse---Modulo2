@@ -1,10 +1,10 @@
 import {v4 as uuidv4} from 'uuid'
 import fs from 'fs'
+import { getPizzasInFile } from '../utils/getPizzasInFile.js'
 
 export function findMany(request, response) {
     const nameQuery = request.query.name || ""    
-    const pizzasInFile = fs.readFileSync('pizzaList.json').toString()
-    const pizzas = JSON.parse(pizzasInFile)
+   const pizzas = getPizzasInFile()
     const searchedPizzas = pizzas.filter(pizza => pizza.name.toLowerCase().includes(nameQuery.toLowerCase())) 
     response.json(searchedPizzas)
 }
@@ -12,8 +12,7 @@ export function findMany(request, response) {
 export function create(request, response) {
     const {name, description, price, ingredients} = request.body
 
-    const pizzasInFile = fs.readFileSync('pizzaList.json').toString()
-    const pizzas = JSON.parse(pizzasInFile)
+    const pizzas = getPizzasInFile()
 
     const pizzaExists = pizzas.find(pizza => pizza.name === name)
 

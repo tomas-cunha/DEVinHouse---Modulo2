@@ -1,14 +1,17 @@
 import {v4 as uuidv4} from 'uuid'
+import { getSolicitationsInFile } from '../utils/getSolicitationsInFile.js'
+import fs from 'fs'
 
 export function findMany(request, response) {
-    
-    response.json([])
+    const solicitations = getSolicitationsInFile()
+     response.json(solicitations)
 }
 
 export function findOne(request, response) {
-    const orderFiltered = orderList.find((order) => order.document_client === request.params.cpf)
-    console.log(orderFiltered)
-    response.json(orderFiltered)
+    const solicitations = getSolicitationsInFile()
+    const solicitation = solicitations.find((solicitation) => solicitation.document_client === request.params.cpf)
+    console.log(solicitation)
+    response.json(solicitation)
 }
 
 export function create(request, response) {
@@ -36,7 +39,8 @@ export function create(request, response) {
         status: "Em Produção"
       }
 
-    orderList.push(order)
+    const solicitations = getSolicitationsInFile()
+    fs.writeFileSync('solicitations.json', JSON.stringify([...solicitations, solicitation]))   
     return response.status(201).json(order)
 }
 
@@ -44,4 +48,18 @@ export function destroy(request, response) {
     const newOrders = orderList.filter(order => order.id !== request.params.id)
     orderList = [...newOrders]
     response.json({mensagem: 'Pedido deletado com sucesso!'})
+}
+
+export function updateStatus (request, response) {
+
+    const solicitations = getSolicitationsInFile()
+
+    const updatedSolicitations = solicitations.map((solicitation) => {
+        if(solicitation.document_client === request.params.cpf) {
+            solicitation.status = "A caminho"
+        }
+        return solicitation
+    })
+    fs.writeFileSync('solicitations.json', JSON.stringify(updatedSolicitations))
+    return response.json()
 }

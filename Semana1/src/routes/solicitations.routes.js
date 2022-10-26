@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { create, destroy, findMany, findOne } from '../controllers/solicitation.controller.js'
+import { create, destroy, findMany, findOne, updateStatus } from '../controllers/solicitation.controller.js'
 
 const solicitationsRoutes = Router()
 
@@ -10,5 +10,7 @@ solicitationsRoutes.post('/solicitations', create)
 solicitationsRoutes.get('/solicitations/:cpf', findOne)
 
 solicitationsRoutes.delete('/solicitations/:id', destroy)
+
+solicitationsRoutes.patch('/solicitations/:cpf/status', updateStatus)
 
 export default solicitationsRoutes
