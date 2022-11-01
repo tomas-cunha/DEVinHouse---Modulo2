@@ -1,20 +1,22 @@
 import {v4 as uuidv4} from 'uuid'
-import { getSolicitationsInFile } from '../utils/getSolicitationsInFile.js'
+import { getSolicitationsInFile } from '../utils/getSolicitationsInFile'
 import fs from 'fs'
+import { Request, Response } from 'express'
+import { RouteParamsDelete, RouteParamsFindOne, Solicitation } from '../types/solicitations.type'
 
-export function findMany(request, response) {
+export function findMany(request: Request, response: Response) {
     const solicitations = getSolicitationsInFile()
      response.json(solicitations)
 }
 
-export function findOne(request, response) {
+export function findOne(request: Request<RouteParamsFindOne>, response: Response) {
     const solicitations = getSolicitationsInFile()
     const solicitation = solicitations.find((solicitation) => solicitation.document_client === request.params.cpf)
     console.log(solicitation)
     response.json(solicitation)
 }
 
-export function create(request, response) {
+export function create(request: Request<{}, {}, Solicitation>, response: Response) {
     
     const {
         name_client, 
@@ -40,17 +42,18 @@ export function create(request, response) {
       }
 
     const solicitations = getSolicitationsInFile()
-    fs.writeFileSync('solicitations.json', JSON.stringify([...solicitations, solicitation]))   
+    fs.writeFileSync('solicitations.json', JSON.stringify([...solicitations, order]))   
     return response.status(201).json(order)
 }
 
-export function destroy(request, response) {
-    const newOrders = orderList.filter(order => order.id !== request.params.id)
-    orderList = [...newOrders]
+export function destroy(request: Request<RouteParamsDelete>, response: Response) {
+    const solicitations = getSolicitationsInFile()
+    const newOrders = solicitations.filter(solicitation => solicitation.id !== request.params.id)
+    fs.writeFileSync('solicitations.json', JSON.stringify([...newOrders]))
     response.json({mensagem: 'Pedido deletado com sucesso!'})
 }
 
-export function updateStatus (request, response) {
+export function updateStatus (request: Request<RouteParamsFindOne>, response: Response) {
 
     const solicitations = getSolicitationsInFile()
 

@@ -1,6 +1,8 @@
 import fs from 'fs'
+import { Solicitation } from '../types/solicitations.type'
 
 export function getSolicitationsInFile() {
     const solicitationsInFile = fs.readFileSync('solicitations.json').toString()
-    return  JSON.parse(solicitationsInFile)
+    const data: Array<Solicitation> = JSON.parse(solicitationsInFile)
+    return data
 }

@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { create, destroy, findMany, findOne, updateStatus } from '../controllers/solicitation.controller.js'
+import { create, destroy, findMany, findOne, updateStatus } from '../controllers/solicitation.controller'
 
 const solicitationsRoutes = Router()
 
