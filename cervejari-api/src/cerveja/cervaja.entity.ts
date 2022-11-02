@@ -1,7 +1,7 @@
 import { TipoCerveja } from './tipo-cervaj.enum';
 import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
 
-export class cerveja {
+export class Cerveja {
   @IsNotEmpty()
   @IsString()
   nome: string;
