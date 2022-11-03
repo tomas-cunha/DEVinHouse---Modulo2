@@ -13,10 +13,11 @@ export class Database {
   }
 
   public async gravar(cerveja: Cerveja) {
-    await writeFile(
-      this.FILENAME,
-      JSON.stringify([...(await this.getCervejas()), cerveja]),
-    );
+    let cervejas = await this.getCervejas();
+    if (!cervejas) {
+      cervejas = [];
+    }
+    await writeFile(this.FILENAME, JSON.stringify([...cervejas, cerveja]));
   }
 
   public async gravarCervejas(cervejas: Cerveja[]) {
