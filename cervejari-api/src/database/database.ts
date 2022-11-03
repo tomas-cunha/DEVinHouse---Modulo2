@@ -1,23 +1,25 @@
-import { Cerveja } from 'src/cerveja/cervaja.entity';
-import fs from 'fs';
+import { Cerveja } from 'src/cerveja/cerveja.entity';
+import { writeFile, readFile } from 'fs/promises';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class Database {
   private FILENAME = 'cervejas.json';
 
-  public getCervejas(): Array<Cerveja> {
-    const cervejasInFile = fs.readFileSync(this.FILENAME).toString();
+  public async getCervejas(): Promise<Cerveja[]> {
+    const cervejasInFile = await readFile(this.FILENAME, 'utf-8');
     const cervejas = JSON.parse(cervejasInFile);
     return cervejas;
   }
 
-  public gravar(cerveja: Cerveja) {
-    fs.writeFileSync(
+  public async gravar(cerveja: Cerveja) {
+    await writeFile(
       this.FILENAME,
-      JSON.stringify([...this.getCervejas(), cerveja]),
+      JSON.stringify([...(await this.getCervejas()), cerveja]),
     );
   }
 
-  public gravarCervejas(cervejas: Cerveja[]) {
-    fs.writeFileSync(this.FILENAME, JSON.stringify(cervejas));
+  public async gravarCervejas(cervejas: Cerveja[]) {
+    await writeFile(this.FILENAME, JSON.stringify(cervejas));
   }
 }
