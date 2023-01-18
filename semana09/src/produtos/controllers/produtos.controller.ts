@@ -1,16 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Res } from '@nestjs/common';
 import { ProdutosService } from '../service/produtos.service';
 import { CreateProdutoDto } from '../dto/create-produto.dto';
-import { UpdateProdutoDto } from '../dto/update-produto.dto';
 import { FindOneProductDTO } from '../dto/find-one-product.dto';
+import { Response } from 'express';
+import { HttpException } from '@nestjs/common/exceptions';
+import { HttpStatus } from '@nestjs/common/enums';
+import { ProductEntity } from '../entities/produto.entity';
 
 @Controller('produtos')
 export class ProdutosController {
@@ -22,22 +17,43 @@ export class ProdutosController {
   }
 
   @Get()
-  findAll() {
-    return this.produtosService.findAll();
+  async findAll(): Promise<ProductEntity[]> {
+    try {
+      return this.produtosService.find();
+    } catch (error) {
+      throw new HttpException(
+        { reason: error?.detail },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   @Get(':id')
-  findOne(@Param() param: FindOneProductDTO) {
-    return this.produtosService.findOne(param.id);
+  async findOne(
+    @Param() param: FindOneProductDTO,
+    @Res() response: Response,
+  ): Promise<ProductEntity> {
+    try {
+      const found = await this.produtosService.findOne(param);
+      if (found) {
+        response.status(HttpStatus.OK).send(found);
+        return found;
+      }
+      response
+        .status(HttpStatus.OK)
+        .send(`Nenhum usuário encontrado com o ID ${param.id}`);
+    } catch (error) {}
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
-    return this.produtosService.update(+id, updateProdutoDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.produtosService.remove(+id);
+  @Get('/findByFilter')
+  async findByFilter(@Query() query): Promise<ProductEntity[]> {
+    try {
+      return this.produtosService.find(query);
+    } catch (error) {
+      throw new HttpException(
+        { reason: error?.detail },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

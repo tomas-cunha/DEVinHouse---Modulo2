@@ -1,29 +1,23 @@
 import { CategoriaProduto } from 'src/utils/categoriaProduto.enum';
-import {
-  IsNotEmpty,
-  IsString,
-  IsNumber,
-  IsBoolean,
-  IsEnum,
-} from 'class-validator';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export class Produto {
-  @IsNotEmpty()
-  @IsString()
+@Entity({ name: 'products' })
+export class ProductEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ length: 100 })
   nome: string;
 
-  @IsNotEmpty()
-  @IsNumber()
+  @Column('float')
   valor: number;
 
-  @IsNotEmpty()
-  @IsString()
+  @Column()
   descricao: string;
 
-  @IsNotEmpty()
-  @IsBoolean()
+  @Column()
   disponivel = true;
 
-  @IsEnum(CategoriaProduto)
+  @Column('int')
   categoria: CategoriaProduto;
 }
