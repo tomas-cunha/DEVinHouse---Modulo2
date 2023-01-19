@@ -1,34 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import { ProductEntity } from 'src/produtos/entities/produto.entity';
 import { CarrinhosService } from './carrinhos.service';
-import { CreateCarrinhoDto } from './dto/create-carrinho.dto';
-import { UpdateCarrinhoDto } from './dto/update-carrinho.dto';
+import { CheckoutDto } from './dto/compra-carrinho.dto';
 
 @Controller('carrinhos')
 export class CarrinhosController {
   constructor(private readonly carrinhosService: CarrinhosService) {}
 
   @Post()
-  create(@Body() createCarrinhoDto: CreateCarrinhoDto) {
-    return this.carrinhosService.create(createCarrinhoDto);
+  async addProuct(@Body() product: ProductEntity) {
+    return await this.carrinhosService.addProduct(product);
   }
 
-  @Get()
-  findAll() {
-    return this.carrinhosService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.carrinhosService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCarrinhoDto: UpdateCarrinhoDto) {
-    return this.carrinhosService.update(+id, updateCarrinhoDto);
+  @Get('produtos')
+  async findProductsCarrinho() {
+    return await this.carrinhosService.findProductsCarrinho();
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.carrinhosService.remove(+id);
+  async removeProduct(@Param('id') id: number) {
+    return await this.carrinhosService.removeProduct(id);
+  }
+
+  @Post('checkout')
+  async checkout(@Body() checkoutinfo: CheckoutDto) {
+    try {
+      return await this.carrinhosService.checkout(checkoutinfo);
+    } catch (error) {
+      if (error.reason == 'Invalid payment info')
+        throw new HttpException(
+          { detail: error.reason },
+          HttpStatus.BAD_REQUEST,
+        );
+    }
   }
 }

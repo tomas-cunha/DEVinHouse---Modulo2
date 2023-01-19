@@ -1,5 +1,6 @@
+import { CarrinhoEntity } from 'src/carrinhos/entities/carrinho.entity';
 import { CategoriaProduto } from 'src/utils/categoriaProduto.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
 
 @Entity({ name: 'products' })
 export class ProductEntity {
@@ -20,4 +21,7 @@ export class ProductEntity {
 
   @Column('int')
   categoria: CategoriaProduto;
+
+  @ManyToMany(() => CarrinhoEntity)
+  carrinho: CarrinhoEntity;
 }
