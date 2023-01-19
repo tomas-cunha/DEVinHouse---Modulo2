@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProdutosModule } from './produtos/produtos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { TwitterModule } from './twitter/twitter.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ 
@@ -11,7 +12,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
       isGlobal: true 
     }),
     ProdutosModule, 
-    UsuariosModule
+    UsuariosModule, TwitterModule
   ],
   controllers: [AppController],
   providers: [    
