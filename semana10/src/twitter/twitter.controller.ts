@@ -3,16 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   HttpException,
   HttpStatus,
   Query,
 } from '@nestjs/common';
 import { TwitterService } from './twitter.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
-import { UpdateTwitterDto } from './dto/update-twitter.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from 'src/core/auth/auth.service';
 import { UserIdDto } from './dto/user-id.dto';
@@ -51,7 +48,7 @@ export class TwitterController {
     }
   }
 
-  @Get()
+  @Get('user')
   async findUserTweets(@Query() query: UserIdDto) {
     try {
       const { userId } = query;
@@ -62,23 +59,14 @@ export class TwitterController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.twitterService.findAll();
+  @Get(':hashtag')
+  async findTweetsByHashtag(@Param() param: { hashtag: string }) {
+    const { hashtag } = param;
+    return await this.twitterService.findTweetsByHashtag(hashtag);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.twitterService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTwitterDto: UpdateTwitterDto) {
-    return this.twitterService.update(+id, updateTwitterDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.twitterService.remove(+id);
+  @Post('link-hashtag')
+  async linkHashtagToTweet(@Body() body) {
+    return this.twitterService.linkHashtagToTweet(body);
   }
 }

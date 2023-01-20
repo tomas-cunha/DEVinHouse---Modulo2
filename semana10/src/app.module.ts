@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ProdutosModule } from './produtos/produtos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { TwitterModule } from './twitter/twitter.module';
+import { HashtagModule } from './hashtag/hashtag.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ 
@@ -12,7 +13,7 @@ import { TwitterModule } from './twitter/twitter.module';
       isGlobal: true 
     }),
     ProdutosModule, 
-    UsuariosModule, TwitterModule
+    UsuariosModule, TwitterModule, HashtagModule
   ],
   controllers: [AppController],
   providers: [    

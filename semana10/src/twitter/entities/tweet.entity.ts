@@ -1,9 +1,12 @@
+import { HashtagEntity } from 'src/hashtag/entities/hashtag.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToOne,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -20,6 +23,10 @@ export class TweetEntity {
   @ManyToOne(() => UserEntity, (user) => user.tweets, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
+
+  @ManyToMany(() => HashtagEntity)
+  @JoinTable({ name: 'tweets_hashtags' })
+  hashtags: HashtagEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

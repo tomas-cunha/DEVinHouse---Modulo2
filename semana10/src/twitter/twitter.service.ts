@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { CreateTweetDto } from './dto/create-tweet.dto';
-import { UpdateTwitterDto } from './dto/update-twitter.dto';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { TweetEntity } from './entities/tweet.entity';
@@ -83,19 +82,45 @@ export class TwitterService {
     createdAt,
   });
 
-  findAll() {
-    return `This action returns all twitter`;
+  linkHashtagToTweet(body) {
+    return new Promise(async (resolve) => {
+      const { tweetId, hashtagId } = body;
+
+      const linkedTweet = this.tweetRepository.create({
+        id: tweetId,
+        hashtags: [{ hashtagId: hashtagId }],
+      });
+
+      this.tweetRepository.save(linkedTweet);
+      resolve(true);
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} twitter`;
+  findTweetsByHashtag(hashtag: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const tweets = await this.tweetRepository.find({
+          relations: {
+            hashtags: true,
+          },
+        });
+
+        const tweetsWithHashtag = this.getTweetsWithHashtags(tweets, hashtag);
+
+        resolve(tweetsWithHashtag);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
-  update(id: number, updateTwitterDto: UpdateTwitterDto) {
-    return `This action updates a #${id} twitter`;
-  }
+  getTweetsWithHashtags(tweets: TweetEntity[], searchedHashtag: string) {
+    const checkIfHasHashTag = ({ hashtag }) =>
+      hashtag === `#${searchedHashtag}`;
 
-  remove(id: number) {
-    return `This action removes a #${id} twitter`;
+    const handleFilteringByHashtag = ({ hashtags }) =>
+      hashtags.some(checkIfHasHashTag);
+
+    return tweets.filter(handleFilteringByHashtag);
   }
 }
