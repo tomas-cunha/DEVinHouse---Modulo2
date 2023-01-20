@@ -26,4 +26,5 @@ export class TweetEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+  tweetInstance: Promise<UserEntity>;
 }

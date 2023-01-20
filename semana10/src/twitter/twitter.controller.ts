@@ -6,9 +6,11 @@ import {
   Patch,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { TwitterService } from './twitter.service';
-import { CreateTwitterDto } from './dto/create-twitter.dto';
+import { CreateTweetDto } from './dto/create-tweet.dto';
 import { UpdateTwitterDto } from './dto/update-twitter.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from 'src/core/auth/auth.service';
@@ -21,9 +23,13 @@ export class TwitterController {
     private readonly authService: AuthService,
   ) {}
 
-  @Post()
-  create(@Body() createTwitterDto: CreateTwitterDto) {
-    return this.twitterService.create(createTwitterDto);
+  @Post('/tweet')
+  async createTweet(@Body() createTweetDto: CreateTweetDto) {
+    try {
+      return await this.twitterService.createTweet(createTweetDto);
+    } catch (error) {
+      throw new HttpException(error.detail, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Post('user')

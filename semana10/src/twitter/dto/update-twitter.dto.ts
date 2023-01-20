@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateTwitterDto } from './create-twitter.dto';
+import { CreateTweetDto } from './create-tweet.dto';
 
-export class UpdateTwitterDto extends PartialType(CreateTwitterDto) {}
+export class UpdateTwitterDto extends PartialType(CreateTweetDto) {}
