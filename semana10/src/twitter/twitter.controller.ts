@@ -8,13 +8,14 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { TwitterService } from './twitter.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { UpdateTwitterDto } from './dto/update-twitter.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from 'src/core/auth/auth.service';
-import { UserEntity } from './entities/user.entity';
+import { UserIdDto } from './dto/user-id.dto';
 
 @Controller('twitter')
 export class TwitterController {
@@ -45,6 +46,17 @@ export class TwitterController {
   async findFeed() {
     try {
       return await this.twitterService.findFeed();
+    } catch (error) {
+      throw new HttpException({ detail: error.detail }, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get()
+  async findUserTweets(@Query() query: UserIdDto) {
+    try {
+      const { userId } = query;
+      console.log(userId);
+      return await this.twitterService.findUserTweets(userId);
     } catch (error) {
       throw new HttpException({ detail: error.detail }, HttpStatus.BAD_REQUEST);
     }

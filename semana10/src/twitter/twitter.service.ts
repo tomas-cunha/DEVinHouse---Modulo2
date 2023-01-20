@@ -48,24 +48,40 @@ export class TwitterService {
           take: 20,
         });
 
-        const getFormattedFeedTweet = ({
-          content,
-          createdAt,
-          user: { name, username },
-        }): FeedTweetDto => ({
-          name,
-          username,
-          content,
-          createdAt,
-        });
-
-        const feedTweets = tweets.map(getFormattedFeedTweet);
+        const feedTweets = tweets.map(this.getFormattedTweet);
         resolve(feedTweets);
       } catch (error) {
         reject({ code: error.code, detail: error.detail });
       }
     });
   }
+
+  async findUserTweets(userId: number) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const userTweets = await this.tweetRepository.find({
+          relations: { user: true },
+          where: { user: { id: userId } },
+          order: { createdAt: 'DESC' },
+        });
+        const formattedTweets = userTweets.map(this.getFormattedTweet);
+        resolve(formattedTweets);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  getFormattedTweet = ({
+    content,
+    createdAt,
+    user: { name, username },
+  }): FeedTweetDto => ({
+    name,
+    username,
+    content,
+    createdAt,
+  });
 
   findAll() {
     return `This action returns all twitter`;
