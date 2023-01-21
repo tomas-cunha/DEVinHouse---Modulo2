@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Query,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { TwitterService } from './twitter.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
@@ -15,6 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from 'src/core/auth/auth.service';
 import { UserIdDto } from './dto/user-id.dto';
 import { CredentialsDTO } from 'src/core/auth/dto/credentiasl.dto';
+import { JwtAuthGuard } from 'src/core/auth/guards/strategy/jwt-auth.guard';
 
 @Controller('twitter')
 export class TwitterController {
@@ -23,6 +25,7 @@ export class TwitterController {
     private readonly authService: AuthService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('/tweet')
   async createTweet(@Body() createTweetDto: CreateTweetDto) {
     try {
@@ -45,6 +48,7 @@ export class TwitterController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('feed')
   async findFeed() {
     try {
@@ -54,6 +58,7 @@ export class TwitterController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('user')
   async findUserTweets(@Query() query: UserIdDto) {
     try {
@@ -65,12 +70,14 @@ export class TwitterController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':hashtag')
   async findTweetsByHashtag(@Param() param: { hashtag: string }) {
     const { hashtag } = param;
     return await this.twitterService.findTweetsByHashtag(hashtag);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('link-hashtag')
   async linkHashtagToTweet(@Body() body) {
     return this.twitterService.linkHashtagToTweet(body);
