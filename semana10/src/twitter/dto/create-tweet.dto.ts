@@ -5,7 +5,4 @@ export class CreateTweetDto {
   @IsNotEmpty()
   @MaxLength(280)
   content: string;
-
-  @IsNotEmpty()
-  userId: number;
 }

@@ -34,4 +34,11 @@ export class TweetEntity {
   @UpdateDateColumn()
   updatedAt: Date;
   tweetInstance: Promise<UserEntity>;
+
+  addHashtags(hashtags: HashtagEntity[]) {
+    if (!this.hashtags) {
+      this.hashtags = new Array<HashtagEntity>();
+    }
+    this.hashtags.push(...hashtags);
+  }
 }

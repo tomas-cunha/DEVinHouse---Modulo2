@@ -9,6 +9,7 @@ import {
   Query,
   ValidationPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { TwitterService } from './twitter.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
@@ -27,9 +28,9 @@ export class TwitterController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/tweet')
-  async createTweet(@Body() createTweetDto: CreateTweetDto) {
+  async createTweet(@Body() createTweetDto: CreateTweetDto, @Request() req) {
     try {
-      return await this.twitterService.createTweet(createTweetDto);
+      return await this.twitterService.createTweet(createTweetDto, req.user);
     } catch (error) {
       throw new HttpException(error.detail, HttpStatus.BAD_REQUEST);
     }

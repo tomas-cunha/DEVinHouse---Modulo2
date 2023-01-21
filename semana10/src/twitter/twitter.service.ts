@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { TweetEntity } from './entities/tweet.entity';
 import { FeedTweetDto } from './dto/tweet-feed.dto';
+import { JwtPayloadUserDto } from 'src/core/auth/dto/user-payload.dto';
+import { HashtagEntity } from 'src/hashtag/entities/hashtag.entity';
 
 @Injectable()
 export class TwitterService {
@@ -13,17 +15,25 @@ export class TwitterService {
 
     @Inject('TWEET_REPOSITORY')
     private readonly tweetRepository: Repository<TweetEntity>,
+
+    @Inject('HASHTAGS_REPOSITORY')
+    private hashtagsRepository: Repository<HashtagEntity>,
   ) {}
 
-  createTweet(createTweetDto: CreateTweetDto) {
+  createTweet(
+    createTweetDto: CreateTweetDto,
+    jwtPayloadUser: JwtPayloadUserDto,
+  ) {
     return new Promise(async (resolve, reject) => {
       try {
-        let newTweet = this.tweetRepository.create();
-        newTweet = { ...createTweetDto, ...newTweet };
-        const { userId } = createTweetDto;
+        const newTweet = this.tweetRepository.create(createTweetDto);
+        const hashtags = this.getHashtags(newTweet.content);
+        newTweet.addHashtags(hashtags);
+
+        const { id } = jwtPayloadUser;
         const user = await this.userRepository.findOne({
           where: {
-            id: userId,
+            id,
           },
           relations: {
             tweets: true,
@@ -36,6 +46,15 @@ export class TwitterService {
         reject({ code: error.code, detail: error.detail });
       }
     });
+  }
+
+  getHashtags(tweet: string) {
+    const hashtags = tweet
+      .split(' ')
+      .filter((word) => word.startsWith('#') && word.length > 1)
+      .map((hashtag) => this.hashtagsRepository.create({ hashtag }));
+
+    return hashtags;
   }
 
   async findFeed(): Promise<FeedTweetDto[]> {
