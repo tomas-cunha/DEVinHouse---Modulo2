@@ -18,8 +18,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from 'src/core/auth/auth.service';
 import { UserIdDto } from './dto/user-id.dto';
 import { CredentialsDTO } from 'src/core/auth/dto/credentiasl.dto';
-import { JwtAuthGuard } from 'src/core/auth/guards/strategy/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/core/auth/guards/jwt-auth.guard';
 import { ChangePasswordDto } from 'src/core/auth/dto/change-password.dto';
+import { GoogleOAuthGuard } from 'src/core/auth/guards/google-oauth.guard';
 
 @Controller('twitter')
 export class TwitterController {
@@ -93,10 +94,7 @@ export class TwitterController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/auth/trocar-senha')
-  async changePassword(
-    @Request() req,
-    @Body() changePasswordDto: ChangePasswordDto,
-  ) {
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     try {
       await this.authService.changePassword(changePasswordDto);
     } catch (error) {
@@ -105,5 +103,18 @@ export class TwitterController {
       }
       return { code: error.code, detail: error.detail };
     }
+  }
+
+  @Get('/auth/google-redirect')
+  @UseGuards(GoogleOAuthGuard)
+  googleAuthRedirect(@Request() req) {
+    if (!req.user) {
+      return 'Sem usuário retornado do google';
+    }
+
+    return {
+      mensagem: 'Google Info',
+      user: req.user,
+    };
   }
 }
