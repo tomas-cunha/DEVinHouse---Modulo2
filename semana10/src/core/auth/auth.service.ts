@@ -1,12 +1,15 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from 'src/twitter/dto/create-user.dto';
 import { UserEntity } from 'src/twitter/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { CredentialsDTO } from './dto/credentiasl.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private jwtService: JwtService,
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<UserEntity>,
   ) {}
@@ -33,5 +36,34 @@ export class AuthService {
 
   private async hashPassword(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt);
+  }
+
+  async checkCredentials(credentials: CredentialsDTO) {
+    const { email, password } = credentials;
+    const user = await this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (user && (await user.checkPassword(password))) {
+      return user;
+    }
+    return null;
+  }
+
+  async signIn(credentials: CredentialsDTO) {
+    const user = await this.checkCredentials(credentials);
+    if (user === null) {
+      throw new UnauthorizedException('E-mail e/ou senha incorretos');
+    }
+
+    const jwtPayload = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+    const token = await this.jwtService.sign(jwtPayload);
+    return { token };
   }
 }

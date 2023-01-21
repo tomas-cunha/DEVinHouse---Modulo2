@@ -7,12 +7,14 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TwitterService } from './twitter.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from 'src/core/auth/auth.service';
 import { UserIdDto } from './dto/user-id.dto';
+import { CredentialsDTO } from 'src/core/auth/dto/credentiasl.dto';
 
 @Controller('twitter')
 export class TwitterController {
@@ -68,5 +70,10 @@ export class TwitterController {
   @Post('link-hashtag')
   async linkHashtagToTweet(@Body() body) {
     return this.twitterService.linkHashtagToTweet(body);
+  }
+
+  @Post('/auth/signin')
+  async signIn(@Body(ValidationPipe) credentialsDto: CredentialsDTO) {
+    return await this.authService.signIn(credentialsDto);
   }
 }
