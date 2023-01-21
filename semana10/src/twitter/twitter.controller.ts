@@ -35,7 +35,11 @@ export class TwitterController {
   @Post('user')
   async createUser(@Body() createUserDto: CreateUserDto) {
     try {
-      return await this.authService.createUser(createUserDto);
+      const { email, password } = await this.authService.createUser(
+        createUserDto,
+      );
+      const credentials: CredentialsDTO = { email, password };
+      return await this.signIn(credentials);
     } catch (error) {
       return { code: error.code, detail: error.detail };
     }
