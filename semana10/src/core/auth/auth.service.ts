@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CredentialsDTO } from './dto/credentiasl.dto';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayloadUserDto } from './dto/user-payload.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -65,5 +67,32 @@ export class AuthService {
     };
     const token = await this.jwtService.sign(jwtPayload);
     return { token };
+  }
+
+  changePassword(changePasswordDto: ChangePasswordDto) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { email, oldPassword } = changePasswordDto;
+
+        const user = await this.checkCredentials({
+          email,
+          password: oldPassword,
+        } as CredentialsDTO);
+
+        if (user === null) {
+          reject(null);
+          return;
+        }
+
+        user.password = await this.hashPassword(
+          changePasswordDto.newPassword,
+          user.salt,
+        );
+        await this.userRepository.save(user);
+        resolve('Senha alterada com sucesso');
+      } catch (error) {
+        reject({ detail: error.detail, code: error.code });
+      }
+    });
   }
 }
